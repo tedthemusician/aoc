@@ -45,12 +45,6 @@
                     ""
                     "iyr:2010 hgt:158cm hcl:#b6652a ecl:blu byr:1944 eyr:2021 pid:093154719" ])
 
-(defn lines->pp-strings
-  "Group lines into passport strings by splitting on blank lines"
-  [lines]
-  (map #(str/join " " %)
-       (remove (partial = [""]) (partition-by empty? lines))))
-
 (defn assoc-field [pp s]
   "Associate part of a passport with an existing passport hashmap"
   (let [[field-key field-val] (str/split s #":")]
@@ -107,21 +101,19 @@
     (and (= 7 (count relevant-fields))
          (every? field-valid? relevant-fields))))
 
-(def lines->pps (comp (partial map pp-string->pp) lines->pp-strings))
-
 (defn solve
   "From an input string, how many passports satisfy [pred]?"
-  [pred lines]
-  (count (filter pred (lines->pps lines))))
+  [pred paragraphs]
+  (count (filter pred (map pp-string->pp paragraphs))))
 
 (def solve-1 (partial solve has-all-keys?))
 (def solve-2 (partial solve pp-valid?))
 
-(assert (= (solve-1 mixed-sample) 2))
-(assert (= (solve-2 invalid-sample) 0))
-(assert (= (solve-2 valid-sample) 4))
+(assert (= (solve-1 (utils/make-paragraphs mixed-sample)) 2))
+(assert (= (solve-2 (utils/make-paragraphs invalid-sample)) 0))
+(assert (= (solve-2 (utils/make-paragraphs valid-sample)) 4))
 
-(def input (utils/get-lines 4))
+(def input (utils/get-paragraphs 4))
 
 (assert (= (solve-1 input) 226))
 (assert (= (solve-2 input) 160))
