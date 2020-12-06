@@ -2,6 +2,18 @@
   (:require [clojure.string :as str])
   (:gen-class))
 
+(defn lines->groups
+  "Split lines into groups delimited by blank lines"
+  [lines]
+  (remove (partial = [""]) (partition-by empty? lines)))
+
+(defn groups->paragraphs
+  "Convert groups of lines into single paragraphs"
+  ([groups sep]
+   (map #(str/join sep %) groups))
+  ([groups]
+   (groups->paragraphs groups " ")))
+
 (defn get-lines
   "Get individual lines from a day's input, left-padded to two digits with 0"
   [n]
@@ -9,12 +21,5 @@
         fname (str "./resources/" basename ".txt")]
     (str/split-lines (slurp fname))))
 
-(defn make-paragraphs
-  "Get chunks of text separated by blank lines"
-  ([lines sep]
-   (map #(str/join sep %)
-        (remove (partial = [""]) (partition-by empty? lines))))
-  ([lines]
-   (make-paragraphs lines " ")))
+(def get-line-groups (comp lines->groups (partial get-lines)))
 
-(def get-paragraphs (comp make-paragraphs get-lines))
