@@ -45,23 +45,27 @@
                     ""
                     "iyr:2010 hgt:158cm hcl:#b6652a ecl:blu byr:1944 eyr:2021 pid:093154719" ])
 
-(defn assoc-field [pp s]
+(defn assoc-field
   "Associate part of a passport with an existing passport hashmap"
+  [pp s]
   (let [[field-key field-val] (str/split s #":")]
     (assoc pp (keyword field-key) field-val)))
 
-(defn pp-string->pp [s]
+(defn pp-string->pp
   "Convert a passport string into a passport hashmap"
+  [s]
   (let [field-strings (str/split s #" ")]
     (reduce assoc-field {} field-strings)))
 
-(defn has-all-keys? [pp]
+(defn has-all-keys?
   "Without considering :cid, does this passport have all required keys?"
+  [pp]
   (= #{:byr :iyr :eyr :hgt :hcl :ecl :pid} (disj (set (keys pp)) :cid)))
 
-(defn make-num-validator [low high]
+(defn make-num-validator
   "Create a function to determine whether a string is numeric and is between
   [low] and [high]"
+  [low high]
   (fn [s] (let [n (edn/read-string s)]
      (and (number? n) (>= n low) (<= n high)))))
 
@@ -70,10 +74,11 @@
   [re]
   (fn [s] (some? (re-matches re s))))
 
-(defn hgt-valid? [s]
+(defn hgt-valid?
   "Is this height a number followed immediately by 'cm' or 'in', and does it
   satisfy the low-high requirements of each of those units?"
-  (if-let [[full-match height units] (re-matches #"^(\d+)(cm|in)$" s)]
+  [s]
+  (if-let [[_ height units] (re-matches #"^(\d+)(cm|in)$" s)]
     (case units
       "cm" ((make-num-validator 150 193) height)
       "in" ((make-num-validator 59 76) height))
@@ -94,9 +99,10 @@
   [[k v]]
   ((get validators k (constantly false)) v))
 
-(defn pp-valid? [pp]
+(defn pp-valid?
   "Without considering :cid, does this passport have all required fields, and
   do they all meet their value requirements?"
+  [pp]
   (let [relevant-fields (dissoc pp :cid)]
     (and (= 7 (count relevant-fields))
          (every? field-valid? relevant-fields))))

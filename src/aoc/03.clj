@@ -26,16 +26,18 @@
   [rows dx]
   (reduce + (map-indexed #(val-at %2 dx %1) rows)))
 
-(defn glide [rows dx dy]
+(defn glide
   "How many trees did we hit at this heading, where both dx and dy can change?
   Any dy over 1 will allow us to drop some of the rows, since we'll never hit
   any of their trees."
+  [rows dx dy]
   (get-sum (take-nth dy rows) dx))
 
 (defn solve-1 [lines] (glide lines 3 1))
 
-(defn solve-2 [lines]
+(defn solve-2
   "Get the product of the numbers of trees at each of these headings"
+  [lines]
   (let [vels [[1 1]
               [3 1]
               [5 1]

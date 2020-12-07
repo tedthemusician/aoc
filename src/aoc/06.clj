@@ -21,17 +21,19 @@
              "b"])
 
 
-(defn solve-1 [groups]
+(defn solve-1
   "How many distinct letters are there per paragraph?"
+  [groups]
   (reduce + (map (comp count set) (utils/groups->paragraphs groups ""))))
 
 (defn num-common-elems
-  "How many elements are common to every coll?"
   [colls]
+  "How many elements are common to every coll?"
   (count (apply set/intersection (map set colls))))
 
-(defn solve-2 [groups]
+(defn solve-2
   "In each group, how many letters are common to all lines?"
+  [groups]
   (reduce + (map num-common-elems groups)))
 
 (def grouped-sample (utils/lines->groups sample))

@@ -8,21 +8,24 @@
              "1-3 b: cdefg"
              "2-9 c: ccccccccc"])
 
-(defn components [s]
+(defn components
   "Get the password, low, high, and interesting letter from an entry"
+  [s]
   (let [[amount-str letter-str pw] (str/split s #" ")
         [low high] (map edn/read-string (str/split amount-str #"-"))
         letter (first letter-str)]
     {:pw pw, :low low, :high high, :letter letter}))
 
-(defn valid-1? [s]
+(defn valid-1?
   "Does the interesting letter occur in this password from [low] to [high] times?"
+  [s]
   (let [{:keys [pw low high letter]} (components s)
         occurrences (get (frequencies pw) letter 0)]
     (and (>= occurrences low) (<= occurrences high))))
 
-(defn valid-2? [s]
+(defn valid-2?
   "Does the interesting letter occur at position [low] xor [high] (1-indexed)?"
+  [s]
   (let [{:keys [pw low high letter]} (components s)
         match-low? (= letter (nth pw (dec low)))
         match-high? (= letter (nth pw (dec high)))]
