@@ -83,5 +83,5 @@
 (def input (utils/get-lines 9))
 
 (assert (= (solve-1 25 input) 27911108))
-(assert (= (solve-2 input) 4023754))
+(assert (= (solve-2 25 input) 4023754))
 
