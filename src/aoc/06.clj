@@ -1,6 +1,5 @@
 (ns aoc.06
-  (:require [clojure.string :as str]
-            [clojure.set :as set]
+  (:require [clojure.set :as set]
             [aoc.utils :as utils])
   (:gen-class))
 

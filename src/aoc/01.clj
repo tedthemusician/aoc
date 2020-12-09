@@ -1,6 +1,5 @@
 (ns aoc.01
-  (:require [clojure.string :as str]
-            [clojure.edn :as edn]
+  (:require [clojure.edn :as edn]
             [clojure.math.combinatorics :as combo]
             [aoc.utils :as utils])
   (:gen-class))
