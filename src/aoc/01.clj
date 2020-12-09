@@ -22,15 +22,15 @@
   [quantity]
   (fn [nums] (some makes-2020? (combo/combinations nums quantity))))
 
-(defn solve
+(defn find-2020-addends
   "Given a quantity, solve the input that comes from utils/get-lines for today"
   [lines quantity]
   (let [all-nums (map edn/read-string lines)
         addends ((make-2020-finder quantity) all-nums)]
     (reduce * addends)))
 
-(defn solve-1 [lines] (solve lines 2))
-(defn solve-2 [lines] (solve lines 3))
+(defn solve-1 [lines] (find-2020-addends lines 2))
+(defn solve-2 [lines] (find-2020-addends lines 3))
 
 (assert (= (solve-1 sample) 514579))
 (assert (= (solve-2 sample) 241861950))
