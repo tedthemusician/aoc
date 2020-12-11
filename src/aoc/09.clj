@@ -1,29 +1,28 @@
 (ns aoc.09
-  (:require [clojure.edn :as edn]
-            [clojure.math.combinatorics :as combo]
+  (:require [clojure.math.combinatorics :as combo]
             [aoc.utils :as utils])
   (:gen-class))
 
-(def sample ["35"
-             "20"
-             "15"
-             "25"
-             "47"
-             "40"
-             "62"
-             "55"
-             "65"
-             "95"
-             "102"
-             "117"
-             "150"
-             "182"
-             "127"
-             "219"
-             "299"
-             "277"
-             "309"
-             "576"])
+(def sample [35
+             20
+             15
+             25
+             47
+             40
+             62
+             55
+             65
+             95
+             102
+             117
+             150
+             182
+             127
+             219
+             299
+             277
+             309
+             576])
 
 (defn valid?
   "Is [x] the sum of two distinct numbers in [coll?]"
@@ -63,24 +62,20 @@
   [x coll]
   (first (filter #(= x (reduce + %)) (all-subseqs coll))))
 
-(defn solve-1
-  "What's the first invalid number in our input?"
-  [pre-len lines]
-  (first-invalid pre-len (map edn/read-string lines)))
+(def solve-1 first-invalid)
 
 (defn solve-2
   "What is the sum of the smallest and largest of the sequential numbers in our
   input that add up to the first invalid number in our input?"
-  [pre-len lines]
-  (let [numbers (map edn/read-string lines)
-        invalid (first-invalid pre-len numbers)
-        addends (sequential-addends invalid numbers)]
+  [pre-len nums]
+  (let [invalid (first-invalid pre-len nums)
+        addends (sequential-addends invalid nums)]
     (+ (apply min addends) (apply max addends))))
 
 (assert (= (solve-1 5 sample) 127))
 (assert (= (solve-2 5 sample) 62))
 
-(def input (utils/get-lines 9))
+(def input (utils/get-read-lines 9))
 
 (assert (= (solve-1 25 input) 27911108))
 (assert (= (solve-2 25 input) 4023754))

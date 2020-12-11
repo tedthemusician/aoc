@@ -1,5 +1,6 @@
 (ns aoc.utils
-  (:require [clojure.string :as str])
+  (:require [clojure.string :as str]
+            [clojure.edn :as edn])
   (:gen-class))
 
 (defn lines->groups
@@ -20,6 +21,11 @@
   (let [basename (format "%02d" n)
         fname (str "./resources/" basename ".txt")]
     (str/split-lines (slurp fname))))
+
+(defn get-read-lines
+  "Get individual lines from a day's input and parse them as edn"
+  [n]
+  (map edn/read-string (get-lines n)))
 
 (def get-line-groups (comp lines->groups (partial get-lines)))
 
