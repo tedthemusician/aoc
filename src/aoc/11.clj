@@ -23,9 +23,9 @@
   "Convert a character to 0 or 1 for a filled state or nil if no seat"
   [s]
   (case s
-	\. nil
-	\L 0
-	\# 1))
+    \. nil
+    \L 0
+    \# 1))
 
 (defn parse-row
   "Convert a line to a row of seats. Return a vector for random access later."
@@ -97,22 +97,22 @@
   "Get a seat's next state by neighbor count and number of filled seats allowed"
   [state neighbors tolerance]
   (let [total (sum-numbers neighbors)]
-	(cond
-	  (nil? state) nil
-	  (zero? total) 1
-	  (>= total tolerance) 0
-	  :otherwise state)))
+    (cond
+      (nil? state) nil
+      (zero? total) 1
+      (>= total tolerance) 0
+      :otherwise state)))
 
 (defn iter
   "Get the next state of all seats"
   [seats tabulator tolerance]
   (vec (map-indexed
-		 (fn [y row]
-		   (vec (map-indexed
-				  (fn [x state]
-					(next-state state (tabulator seats x y) tolerance))
-				  row)))
-		 seats)))
+         (fn [y row]
+           (vec (map-indexed
+                  (fn [x state]
+                    (next-state state (tabulator seats x y) tolerance))
+                  row)))
+         seats)))
 
 (defn stabilize
   "Iterate through seated states until we reach a repeat"
