@@ -15,12 +15,14 @@
   ([groups]
    (groups->paragraphs groups " ")))
 
-(defn get-lines
-  "Get individual lines from a day's input, left-padded to two digits with 0"
+(defn get-text
+  "Get raw taxt from a day's input"
   [year day]
   (let [basename (format "%02d" day)
         fname (str "./resources/" year "/" basename ".txt")]
-    (str/split-lines (slurp fname))))
+    (slurp fname)))
+
+(def get-lines (comp str/split-lines (partial get-text)))
 
 (defn get-read-lines
   "Get individual lines from a day's input and parse them as edn"
