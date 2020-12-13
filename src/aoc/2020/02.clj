@@ -1,4 +1,4 @@
-(ns aoc.02
+(ns aoc.2020.02
   (:require [clojure.string :as str]
             [clojure.edn :as edn]
             [aoc.utils :as utils])
@@ -37,7 +37,7 @@
 (assert (= (solve-1 sample) 2))
 (assert (= (solve-2 sample) 1))
 
-(def input (utils/get-lines 2))
+(def input (utils/get-lines 2020 2))
 
 (assert (= (solve-1 input) 546))
 (assert (= (solve-2 input) 275))

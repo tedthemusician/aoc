@@ -1,4 +1,4 @@
-(ns aoc.09
+(ns aoc.2020.09
   (:require [clojure.math.combinatorics :as combo]
             [aoc.utils :as utils])
   (:gen-class))
@@ -75,7 +75,7 @@
 (assert (= (solve-1 5 sample) 127))
 (assert (= (solve-2 5 sample) 62))
 
-(def input (utils/get-read-lines 9))
+(def input (utils/get-read-lines 2020 9))
 
 (assert (= (solve-1 25 input) 27911108))
 (assert (= (solve-2 25 input) 4023754))

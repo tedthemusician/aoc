@@ -1,4 +1,4 @@
-(ns aoc.03
+(ns aoc.2020.03
   (:require [aoc.utils :as utils])
   (:gen-class))
 
@@ -48,7 +48,7 @@
 (assert (= (solve-1 sample) 7))
 (assert (= (solve-2 sample) 336))
 
-(def input (utils/get-lines 3))
+(def input (utils/get-lines 2020 3))
 
 (assert (= (solve-1 input) 195))
 (assert (= (solve-2 input) 3772314000))

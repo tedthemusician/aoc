@@ -1,4 +1,4 @@
-(ns aoc.01
+(ns aoc.2020.01
   (:require [clojure.edn :as edn]
             [clojure.math.combinatorics :as combo]
             [aoc.utils :as utils])
@@ -32,7 +32,7 @@
 (assert (= (solve-1 sample) 514579))
 (assert (= (solve-2 sample) 241861950))
 
-(def input (utils/get-read-lines 1))
+(def input (utils/get-read-lines 2020 1))
 
 (assert (= (solve-1 input) 437931))
 (assert (= (solve-2 input) 157667328))
