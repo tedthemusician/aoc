@@ -31,3 +31,7 @@
 
 (def get-line-groups (comp lines->groups (partial get-lines)))
 
+(defn indices
+  "Get the indices of elements in [coll] that satisfy [pred]"
+  [pred coll]
+  (keep-indexed #(when (pred %2) %1) coll))
