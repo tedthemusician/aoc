@@ -42,3 +42,8 @@
   "Parse a comma-separated list of numbers"
   [s]
   (map edn/read-string (str/split s #",")))
+
+(defn transpose
+  [m]
+  (apply mapv vector m))
+
