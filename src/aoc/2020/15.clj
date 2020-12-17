@@ -53,7 +53,7 @@
 (defn make-solver
   "Make a function that gets the [n]th number spoken, stariting with the input"
   [n]
-  (fn [text] (play-game (parse-nums text) n)))
+  (fn [text] (play-game (utils/parse-nums text) n)))
 
 (def solve-1 (make-solver 2020))
 (def solve-2 (make-solver 30000000))

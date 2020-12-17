@@ -24,6 +24,8 @@
 
 (def get-lines (comp str/split-lines (partial get-text)))
 
+(def get-groups (comp lines->groups get-lines))
+
 (defn get-read-lines
   "Get individual lines from a day's input and parse them as edn"
   [year day]
@@ -35,3 +37,8 @@
   "Get the indices of elements in [coll] that satisfy [pred]"
   [pred coll]
   (keep-indexed #(when (pred %2) %1) coll))
+
+(defn parse-nums
+  "Parse a comma-separated list of numbers"
+  [s]
+  (map edn/read-string (str/split s #",")))
