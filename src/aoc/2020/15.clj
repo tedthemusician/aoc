@@ -20,11 +20,6 @@
                 "3,2,1" 18
                 "3,1,2" 362})
 
-(defn parse-nums
-  "Parse a comma-separated list of numbers"
-  [s]
-  (map edn/read-string (str/split s #",")))
-
 (defn get-first-times
   "Get a map of numbers to the most recent turn when they were spoken,
   excluding the last number because it's just been spoken."
