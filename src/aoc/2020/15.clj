@@ -53,11 +53,11 @@
 (def solve-1 (make-solver 2020))
 (def solve-2 (make-solver 30000000))
 
-(assert (every? #(= (solve-1 (first %)) (second %)) samples-1))
-(assert (every? #(= (solve-2 (first %)) (second %)) samples-2))
-
-(def input "9,6,0,10,18,2,1")
-
-(assert (= (solve-1 input) 1238))
-(assert (= (solve-2 input) 3475954))
+(defn validate [& args]
+  (let [input "9,6,0,10,18,2,1"]
+    (do
+      (assert (every? #(= (solve-1 (first %)) (second %)) samples-1))
+      (assert (every? #(= (solve-2 (first %)) (second %)) samples-2))
+      (assert (= (solve-1 input) 1238))
+      (assert (= (solve-2 input) 3745954)))))
 

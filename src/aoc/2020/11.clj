@@ -140,11 +140,11 @@
   [lines]
   (get-num-filled (parse-seats lines) get-all-visible 5))
 
-(assert (= (solve-1 sample) 37))
-(assert (= (solve-2 sample) 26))
-
-(def input (utils/get-lines 2020 11))
-
-(assert (= (solve-1 input) 2289))
-(assert (= (solve-2 input) 2059))
+(defn validate [& args]
+  (let [input (utils/get-lines 2020 11)]
+    (do
+      (assert (= (solve-1 sample) 37))
+      (assert (= (solve-2 sample) 26))
+      (assert (= (solve-1 input) 2289))
+      (assert (= (solve-2 input) 2059)))))
 

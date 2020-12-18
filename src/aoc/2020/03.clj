@@ -45,10 +45,10 @@
               [1 2]]]
     (reduce * (map (partial apply (partial glide lines)) vels))))
 
-(assert (= (solve-1 sample) 7))
-(assert (= (solve-2 sample) 336))
-
-(def input (utils/get-lines 2020 3))
-
-(assert (= (solve-1 input) 195))
-(assert (= (solve-2 input) 3772314000))
+(defn validate [& args]
+  (let [input (utils/get-lines 2020 3)]
+    (do
+      (assert (= (solve-1 sample) 7))
+      (assert (= (solve-2 sample) 336))
+      (assert (= (solve-1 input) 195))
+      (assert (= (solve-2 input) 3772314000)))))

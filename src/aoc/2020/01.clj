@@ -29,10 +29,9 @@
 (defn solve-1 [lines] (find-2020-addends lines 2))
 (defn solve-2 [lines] (find-2020-addends lines 3))
 
-(assert (= (solve-1 sample) 514579))
-(assert (= (solve-2 sample) 241861950))
-
-(def input (utils/get-read-lines 2020 1))
-
-(assert (= (solve-1 input) 437931))
-(assert (= (solve-2 input) 157667328))
+(defn validate [& args]
+  (let [input (utils/get-read-lines 2020 1)]
+    (assert (= (solve-1 sample) 514579))
+    (assert (= (solve-2 sample) 241861950))
+    (assert (= (solve-1 input) 437931))
+    (assert (= (solve-2 input) 157667328))))

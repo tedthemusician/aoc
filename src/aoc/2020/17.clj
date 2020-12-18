@@ -47,8 +47,8 @@
 
 (defn pad-space
   "Add a block of 0s before and after a hypercube"
-  [hcube]
-  (let [padded-blocks (map pad-block hcube)
+  [space]
+  (let [padded-blocks (map pad-block space)
         [depth height width] (dimensions (first padded-blocks))
         padding (vec (repeat depth
                              (vec (repeat height
@@ -124,26 +124,30 @@
 (defn num-living [space]
   (reduce + (flatten space)))
 
-(defn num-living-after-6 [space iter-func]
-  (let [num-dimensions (count (dimensions space))]
-    (num-living (first (drop 6 (iterate iter-func space))))))
+; (defn num-living-after-6 [space iter-func]
+;   (let [num-dimensions (count (dimensions space))]
+;     (num-living (first (drop 6 (iterate iter-func space))))))
+
+(defn num-living-after-n
+  [n space iter-func]
+  (loop [i 0, space space]
+    (if (= i n)
+      (num-living space)
+      (recur (inc i) (iter-func space)))))
 
 (defn solve-1
   ""
   [lines]
-  (num-living-after-6 (parse-lines 3 lines) iter-3d))
+  (num-living-after-n 6 (parse-lines 3 lines) iter-3d))
 
 (defn solve-2
   ""
   [lines]
-  (num-living-after-6 (parse-lines 4 lines) iter-4d))
+  (num-living-after-n 6 (parse-lines 4 lines) iter-4d))
 
-; (solve-2 sample)
-
-(assert (= (solve-1 sample) 112))
-
-(def input (utils/get-lines 2020 17))
-
-(assert (= (solve-1 input) 391))
-; (assert (= (solve-2 input) 5865723727753))
+(defn validate [& args]
+  (let [input (utils/get-lines 2020 17)]
+    (do
+      (assert (= (solve-1 sample) 112))
+      (assert (= (solve-1 input) 391)))))
 

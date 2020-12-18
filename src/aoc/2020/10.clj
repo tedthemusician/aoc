@@ -102,14 +102,14 @@
         device-rating (apply max with-ends)]
     (get combo-counts device-rating)))
 
-(assert (= (solve-1 sample-1) 35))
-(assert (= (solve-1 sample-2) 220))
+(defn validate [& args]
+  (let [input (utils/get-read-lines 2020 10)]
+    (do
+      (assert (= (solve-1 sample-1) 35))
+      (assert (= (solve-1 sample-2) 220))
+      (assert (= (solve-2 sample-1) 8))
+      (assert (= (solve-2 sample-2) 19208))
+      (assert (= (solve-1 input) 2080))
+      (assert (= (solve-2 input) 6908379398144)))))
 
-(assert (= (solve-2 sample-1) 8))
-(assert (= (solve-2 sample-2) 19208))
-
-(def input (utils/get-read-lines 2020 10))
-
-(assert (= (solve-1 input) 2080))
-(assert (= (solve-2 input) 6908379398144))
 

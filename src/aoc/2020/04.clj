@@ -115,11 +115,13 @@
 (def solve-1 (partial solve has-all-keys?))
 (def solve-2 (partial solve pp-valid?))
 
-(assert (= (solve-1 (utils/lines->groups mixed-sample)) 2))
-(assert (= (solve-2 (utils/lines->groups invalid-sample)) 0))
-(assert (= (solve-2 (utils/lines->groups valid-sample)) 4))
 
-(def input (utils/get-line-groups 2020 4))
+(defn validate [& args]
+  (let [input (utils/get-line-groups 2020 4)]
+    (do
+      (assert (= (solve-1 (utils/lines->groups mixed-sample)) 2))
+      (assert (= (solve-2 (utils/lines->groups invalid-sample)) 0))
+      (assert (= (solve-2 (utils/lines->groups valid-sample)) 4))
+      (assert (= (solve-1 input) 226))
+      (assert (= (solve-2 input) 160)))))
 
-(assert (= (solve-1 input) 226))
-(assert (= (solve-2 input) 160))

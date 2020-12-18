@@ -118,11 +118,12 @@
 
 (def solve-2 (make-solver make-floating-masker write-to-modified-addresses))
 
-(assert (= (solve-1 sample-1) 165))
-(assert (= (solve-2 sample-2) 208))
+(defn validate [& args]
+  (let [input (utils/get-lines 2020 14)]
+    (do
+      (assert (= (solve-1 sample-1) 165))
+      (assert (= (solve-2 sample-2) 208))
+      (assert (= (solve-1 input) 6513443633260))
+      (assert (= (solve-2 input) 3442819875191)))))
 
-(def input (utils/get-lines 2020 14))
-
-(assert (= (solve-1 input) 6513443633260))
-(assert (= (solve-2 input) 3442819875191))
 

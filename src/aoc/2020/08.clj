@@ -82,11 +82,11 @@
         results (map exec candidates)]
     (:value (first (filter :did-terminate results)))))
 
-(assert (= (solve-1 sample) 5))
-(assert (= (solve-2 sample) 8))
-
-(def input (utils/get-lines 2020 8))
-
-(assert (= (solve-1 input) 2034))
-(assert (= (solve-2 input) 672))
+(defn validate [& args]
+  (let [input (utils/get-lines 2020 8)]
+    (do
+      (assert (= (solve-1 sample) 5))
+      (assert (= (solve-2 sample) 8))
+      (assert (= (solve-1 input) 2034))
+      (assert (= (solve-2 input) 672)))))
 

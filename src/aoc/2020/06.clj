@@ -37,11 +37,11 @@
 
 (def grouped-sample (utils/lines->groups sample))
 
-(assert (= (solve-1 grouped-sample) 11))
-(assert (= (solve-2 grouped-sample) 6))
-
-(def input (utils/get-line-groups 2020 6))
-
-(assert (= (solve-1 input) 6782))
-(assert (= (solve-2 input) 3596))
+(defn validate [& args]
+  (let [input (utils/get-line-groups 2020 6)]
+    (do
+      (assert (= (solve-1 grouped-sample) 11))
+      (assert (= (solve-2 grouped-sample) 6))
+      (assert (= (solve-1 input) 6782))
+      (assert (= (solve-2 input) 3596)))))
 

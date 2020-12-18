@@ -114,12 +114,12 @@
   [lines]
   (find-timestamp (parse-intervals (second lines))))
 
-(assert (= (solve-1 sample-1) 295))
-(assert (= (solve-2 sample-1) 1068781))
-(assert (every? #(= (solve-2 ["" (first %)]) (second %)) samples-2))
-
-(def input (utils/get-lines 2020 13))
-
-(assert (= (solve-1 input) 4808))
-(assert (= (solve-2 input) 741745043105674))
+(defn validate [& args]
+  (let [input (utils/get-lines 2020 13)]
+    (do
+      (assert (= (solve-1 sample-1) 295))
+      (assert (= (solve-2 sample-1) 1068781))
+      (assert (every? #(= (solve-2 ["" (first %)]) (second %)) samples-2))
+      (assert (= (solve-1 input) 4808))
+      (assert (= (solve-2 input) 741745043105674)))))
 

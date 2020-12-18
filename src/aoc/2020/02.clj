@@ -34,11 +34,9 @@
 (defn solve-1 [lines] (count (filter valid-1? lines)))
 (defn solve-2 [lines] (count (filter valid-2? lines)))
 
-(assert (= (solve-1 sample) 2))
-(assert (= (solve-2 sample) 1))
-
-(def input (utils/get-lines 2020 2))
-
-(assert (= (solve-1 input) 546))
-(assert (= (solve-2 input) 275))
-
+(defn validate [& args]
+  (let [input (utils/get-lines 2020 2)]
+    (assert (= (solve-1 sample) 2))
+    (assert (= (solve-2 sample) 1))
+    (assert (= (solve-1 input) 546))
+    (assert (= (solve-2 input) 275))))

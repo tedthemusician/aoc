@@ -49,9 +49,11 @@
         full-flight (set (range low (inc high)))]
     (first (set/difference full-flight ids))))
 
-(assert (= (solve-1 sample) 820))
 
-(def input (utils/get-lines 2020 5))
+(defn validate [& args]
+  (let [input (utils/get-lines 2020 5)]
+    (do
+      (assert (= (solve-1 sample) 820))
+      (assert (= (solve-1 input) 894))
+      (assert (= (solve-2 input) 579)))))
 
-(assert (= (solve-1 input) 894))
-(assert (= (solve-2 input) 579))

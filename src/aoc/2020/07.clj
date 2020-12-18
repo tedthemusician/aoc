@@ -103,11 +103,11 @@
   [lines]
   (get-num-held (get-bags-info lines) "shiny gold"))
 
-(assert (= (solve-1 sample-1) 4))
-(assert (= (solve-2 sample-2) 126))
-
-(def input (utils/get-lines 2020 7))
-
-(assert (= (solve-1 input) 242))
-(assert (= (solve-2 input) 176035))
+(defn validate [& args]
+  (let [input (utils/get-lines 2020 7)]
+    (do
+      (assert (= (solve-1 sample-1) 4))
+      (assert (= (solve-2 sample-2) 126))
+      (assert (= (solve-1 input) 242))
+      (assert (= (solve-2 input) 176035)))))
 

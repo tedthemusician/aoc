@@ -118,11 +118,11 @@
         {:keys [x y]} ship]
     (manhattan-distance x y)))
 
-(assert (= (solve-1 sample) 25))
-(assert (= (solve-2 sample) 286))
-
-(def input (utils/get-lines 2020 12))
-
-(assert (= (solve-1 input) 1148))
-(assert (= (solve-2 input) 52203))
+(defn validate [& args]
+  (let [input (utils/get-lines 2020 12)]
+    (do
+      (assert (= (solve-1 sample) 25))
+      (assert (= (solve-2 sample) 286))
+      (assert (= (solve-1 input) 1148))
+      (assert (= (solve-2 input) 52203)))))
 

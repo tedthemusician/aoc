@@ -169,10 +169,11 @@
                            your-values)]
     (reduce * (map second departure-values))))
 
-(assert (= (solve-1 sample-1) 71))
+(defn validate [& args]
+  (let [input (utils/get-groups 2020 16)]
+    (do
+      (assert (= (solve-1 sample-1) 71))
+      (assert (= (solve-1 input) 25895))
+      (assert (= (solve-2 input) 5865723727753)))))
 
-(def input (utils/get-groups 2020 16))
-
-(assert (= (solve-1 input) 25895))
-(assert (= (solve-2 input) 5865723727753))
 
