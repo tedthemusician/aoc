@@ -1,6 +1,5 @@
 (ns aoc.2020.17
-  (:require [clojure.data.finger-tree :refer [double-list]]
-            [clojure.math.combinatorics :refer [selections]]
+  (:require [clojure.math.combinatorics :refer [selections]]
             [aoc.utils :as utils])
   (:gen-class))
 
@@ -17,6 +16,7 @@
     (last (take (dec num-dimensions) (iterate vector rows)))))
 
 (defn dimensions
+  "Get the length of each dimension in [space]"
   [space]
   (loop [subspace space, dims []]
     (let [this-length (count subspace)]
@@ -55,7 +55,9 @@
                                           (vec (repeat width 0))))))]
   (vec (concat [padding] padded-blocks [padding]))))
 
-(defn neighbor-coords [coords]
+(defn neighbor-coords
+  "Get every point adjacent to [coords], including along diagonals"
+  [coords]
   (let [num-dimensions (count coords)
         offsets (selections [-1 0 1] num-dimensions)
         neighbors (map #(map (partial +) coords %) offsets)]
@@ -64,6 +66,7 @@
 (def neighbor-coords-memo (memoize neighbor-coords))
 
 (defn out-of-bounds?
+  "Does this point lie outside of [space]?"
   [space coords]
   (let [dims (reverse (dimensions space))]
     (some
@@ -71,6 +74,7 @@
       (map (fn [c d] (or (neg? c) (>= c d))) coords dims))))
 
 (defn state-at
+  "The value in [space] at [coords]"
   [space coords]
   (if (out-of-bounds? space coords)
     0
@@ -79,15 +83,20 @@
         subspace
         (recur (nth subspace (first coords)) (rest coords))))))
 
-(defn neighbor-vals [space coords]
+(defn neighbor-vals
+  "The value of every neighbor of [coords]"
+  [space coords]
   (map (partial state-at space) (neighbor-coords-memo coords)))
 
-(defn num-living-neighbors [space coords]
+(defn num-living-neighbors
+  "The number of living neighbors at [coords]"
+  [space coords]
   (apply + (neighbor-vals space coords)))
 
 ; TODO: See if we can generalize stepping through an n-dimensional space
 
 (defn step-cell [space state & coords]
+  "Apply the rules of Conway's game of life to this cell"
   (let [neighbor-count (num-living-neighbors space coords)]
     (cond
       (and (= state 1) (or (= neighbor-count 2) (= neighbor-count 3))) 1
@@ -122,6 +131,7 @@
 (defn iter-4d [space] (step-space-4d (pad-space space)))
 
 (defn num-living [space]
+  "The number of living cells in the current state of [space]"
   (reduce + (flatten space)))
 
 ; (defn num-living-after-6 [space iter-func]
@@ -129,6 +139,7 @@
 ;     (num-living (first (drop 6 (iterate iter-func space))))))
 
 (defn num-living-after-n
+  "The number of living cells in [space] after [n] applications of [iter-func]"
   [n space iter-func]
   (loop [i 0, space space]
     (if (= i n)
@@ -136,12 +147,12 @@
       (recur (inc i) (iter-func space)))))
 
 (defn solve-1
-  ""
+  "The number of living cells after 6 iterations in 3D space"
   [lines]
   (num-living-after-n 6 (parse-lines 3 lines) iter-3d))
 
 (defn solve-2
-  ""
+  "The number of living cells after 6 iterations in 4D space"
   [lines]
   (num-living-after-n 6 (parse-lines 4 lines) iter-4d))
 
@@ -149,5 +160,7 @@
   (let [input (utils/get-lines 2020 17)]
     (do
       (assert (= (solve-1 sample) 112))
-      (assert (= (solve-1 input) 391)))))
+      (assert (= (solve-1 input) 391))
+      (assert (= (solve-2 sample) 848))
+      (assert (= (solve-1 input) 2264)))))
 
