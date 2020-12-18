@@ -6,8 +6,4 @@
 (defn -main
   "Placeholder"
   [& args]
-  (let [sample [".#."
-                "..#"
-                "###"]
-        input (utils/get-lines 2020 17)]
-    (println (day-17/solve-2 input))))
+  (println "I'm just here so the repl doesn't complain."))
