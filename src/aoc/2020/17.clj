@@ -134,10 +134,6 @@
   "The number of living cells in the current state of [space]"
   (reduce + (flatten space)))
 
-; (defn num-living-after-6 [space iter-func]
-;   (let [num-dimensions (count (dimensions space))]
-;     (num-living (first (drop 6 (iterate iter-func space))))))
-
 (defn num-living-after-n
   "The number of living cells in [space] after [n] applications of [iter-func]"
   [n space iter-func]
