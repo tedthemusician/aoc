@@ -3,6 +3,8 @@
             [clojure.edn :as edn])
   (:gen-class))
 
+; TODO: Chech which of these are used elsewhere
+
 (defn lines->groups
   "Split lines into groups delimited by blank lines"
   [lines]
@@ -47,3 +49,5 @@
   [m]
   (apply mapv vector m))
 
+(defn map-vals [f m]
+  (into {} (for [[k v] m] [k (f v)])))
