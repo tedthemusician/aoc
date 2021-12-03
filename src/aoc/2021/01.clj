@@ -36,14 +36,8 @@
 
 (def solve-2 (comp get-increases rolling-sums))
 
-(utils/get-read-lines 2021 1)
-
-(defn validate [& args]
-  (let [input (utils/get-read-lines 2021 1)]
-    (do
-      (assert (= (solve-1 sample) 7))
-      (assert (= (solve-1 input) 1466))
-      (assert (= (solve-2 sample) 5))
-      (assert (= (solve-2 input) 1491)))))
-
-(defn)
+(utils/verify-solutions
+  [{:method solve-1 :sample 7 :input 1466}
+   {:method solve-2 :sample 5 :input 1491}]
+  {:value sample}
+  (utils/get-read-lines 2021 1))

@@ -1,6 +1,7 @@
 (ns aoc.utils
   (:require [clojure.string :as str]
-            [clojure.edn :as edn])
+            [clojure.edn :as edn]
+            [clojure.pprint :refer [pprint]])
   (:gen-class))
 
 ; TODO: Chech which of these are used elsewhere
@@ -55,8 +56,7 @@
 (defn verify-one-input
   [method input expected]
   (let [output (method input)
-        result {:input input
-                :output (method input)}]
+        result {:output (method input)}]
     (if (some? expected)
       (assoc result
              :expected expected
@@ -83,21 +83,26 @@
     {:error "Multiple inputs require multiple expected values"}))
 
 (defn verify-sample
-  [method sample expected]
-  (let [verification-func (if (sequential? sample) verify-multiple-inputs verify-one-input)]
-    (verification-func method sample expected)))
+  [method sample-input expected]
+  (let [{:keys [value multiple]} sample-input
+        verification-func (if multiple
+                            verify-multiple-inputs
+                            verify-one-input)]
+    (verification-func method value expected)))
 
 (defn verify-solution
-  ([solution sample]
-   (let [{:keys [method sample-expected]} solution]
-     {:sample (verify-sample method sample sample-expected)}))
-  ([solution sample input]
-   (let [{:keys [method input-expected]} solution
-         results (verify-solution solution sample)]
+  ([solution sample-input]
+   (let [{:keys [method sample]} solution]
+     {:sample (verify-sample method sample-input sample)}))
+  ([solution sample-input puzzle-input]
+   (let [{:keys [method input]} solution
+         results (verify-solution solution sample-input)]
      (assoc results :puzzle-input
-            (when (some? input)
-              (verify-one-input method input input-expected))))))
+            (when (some? puzzle-input)
+              (verify-one-input method puzzle-input input))))))
 
 (defn verify-solutions
   [solutions & args]
   (map #(apply (partial verify-solution %) args) solutions))
+
+(def show-results (comp pprint verify-solutions))
