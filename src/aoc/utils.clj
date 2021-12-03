@@ -51,3 +51,53 @@
 
 (defn map-vals [f m]
   (into {} (for [[k v] m] [k (f v)])))
+
+(defn verify-one-input
+  [method input expected]
+  (let [output (method input)
+        result {:input input
+                :output (method input)}]
+    (if (some? expected)
+      (assoc result
+             :expected expected
+             :success (= output expected))
+      result)))
+
+(defn verify-multiple-inputs
+  [method inputs expected]
+  (cond
+    (and (sequential? expected) (= (count inputs) (count expected)))
+    (map (partial verify-one-input method) inputs expected)
+
+    (nil? expected)
+    (map (partial verify-one-input method) inputs (repeat nil))
+
+    (sequential? expected)
+    {:error (str "Received "
+                 (count inputs)
+                 " inputs but "
+                 (count expected)
+                 " expected outputs")}
+
+    :else
+    {:error "Multiple inputs require multiple expected values"}))
+
+(defn verify-sample
+  [method sample expected]
+  (let [verification-func (if (sequential? sample) verify-multiple-inputs verify-one-input)]
+    (verification-func method sample expected)))
+
+(defn verify-solution
+  ([solution sample]
+   (let [{:keys [method sample-expected]} solution]
+     {:sample (verify-sample method sample sample-expected)}))
+  ([solution sample input]
+   (let [{:keys [method input-expected]} solution
+         results (verify-solution solution sample)]
+     (assoc results :puzzle-input
+            (when (some? input)
+              (verify-one-input method input input-expected))))))
+
+(defn verify-solutions
+  [solutions & args]
+  (map #(apply (partial verify-solution %) args) solutions))
