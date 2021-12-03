@@ -36,7 +36,7 @@
 
 (def solve-2 (comp get-increases rolling-sums))
 
-(utils/verify-solutions
+(utils/show-results
   [{:method solve-1 :sample 7 :input 1466}
    {:method solve-2 :sample 5 :input 1491}]
   {:value sample}
