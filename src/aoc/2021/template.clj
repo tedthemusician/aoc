@@ -15,7 +15,7 @@
   []
   nil)
 
-(utils/show-results
+(utils/verify-solutions
   ; Add an :input key to verify a puzzle input's expected output
   [{:method solve-1 :sample :s1}
    {:method solve-2 :sample :s2}]
