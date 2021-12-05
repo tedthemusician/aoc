@@ -8,11 +8,11 @@
 (def sample nil)
 
 (defn solve-1
-  []
+  [x]
   nil)
 
 (defn solve-2
-  []
+  [x]
   nil)
 
 (utils/verify-solutions
