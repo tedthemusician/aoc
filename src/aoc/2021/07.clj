@@ -12,11 +12,19 @@
   [xs]
   (nth (sort xs) (int (/ (count xs) 2))))
 
-(defn fuel-used
-  "The sumtorial of the difference between start and stop. Zero if start and
-  stop are the same."
-  [start stop]
-  (reduce + (range 1 (inc (Math/abs (- start stop))))))
+(def sumtorials (reductions + (range)))
+
+(defn sumtorial-lookup
+  [n]
+  (nth sumtorials n))
+
+(def sumtorial (memoize sumtorial-lookup))
+
+(defn fuel-used-at-point
+  [stop [start quantity]]
+  (let [difference (Math/abs (- start stop))
+        fuel-consumption (sumtorial difference)]
+    (* quantity fuel-consumption)))
 
 (defn solve-1
   [nums]
@@ -25,12 +33,13 @@
 
 (defn solve-2
   [nums]
-  (let [low (apply min nums)
+  (let [freqs (frequencies nums)
+        low (apply min nums)
         high (apply max nums)
         candidates (range low (inc high))]
     (:total (reduce (fn [best curr]
-               (let [differences (map (partial fuel-used curr) nums)
-                     total (reduce + differences)]
+               (let [fuel-consumptions (map (partial fuel-used-at-point curr) (into [] freqs)) 
+                     total (reduce + fuel-consumptions)]
                  (if (< total (:total best))
                    {:value curr :total total}
                    best)))
