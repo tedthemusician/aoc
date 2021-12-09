@@ -41,6 +41,10 @@
   [pred coll]
   (keep-indexed #(when (pred %2) %1) coll))
 
+(defn find-index
+  [pred coll]
+  (first (indices pred coll)))
+
 (defn parse-nums
   "Parse a comma-separated list of numbers"
   [s]
