@@ -46,7 +46,7 @@
         (reduce adjust {:y 0 :z 0 :aim 0} commands)]
     (* y z)))
 
-(utils/show-results
+(utils/verify-solutions
   [{:method solve-1 :sample 150 :input 1580000}
    {:method solve-2 :sample 900 :input 1251263225}]
   {:value sample}

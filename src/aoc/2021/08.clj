@@ -1,8 +1,6 @@
 (ns aoc.2021.08
   (:require [clojure.string :as str]
             [clojure.set :as set]
-            [clojure.edn :as edn]
-            [clojure.pprint :refer [pprint]]
             [aoc.utils :as utils])
   (:gen-class))
 
@@ -128,7 +126,6 @@
     (reduce + totals)))
 
 (utils/verify-solutions
-  ; Add an :input key to verify a puzzle input's expected output
   [{:method solve-1 :sample 26 :input 521}
    {:method solve-2 :sample 61229 :input 1016804}]
   {:value sample}

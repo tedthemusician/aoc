@@ -13,8 +13,6 @@
              260
              263])
 
-(count (filter #(< (first %) (second %)) (map vector sample (rest sample))))
-
 (defn get-increases
   "The number of elements whose successor increases"
   [nums]
@@ -36,7 +34,7 @@
 
 (def solve-2 (comp get-increases rolling-sums))
 
-(utils/show-results
+(utils/verify-solutions
   [{:method solve-1 :sample 7 :input 1466}
    {:method solve-2 :sample 5 :input 1491}]
   {:value sample}

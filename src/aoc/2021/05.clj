@@ -1,7 +1,6 @@
 (ns aoc.2021.05
   (:require [clojure.string :as str]
             [clojure.edn :as edn]
-            [clojure.pprint :refer [pprint]]
             [aoc.utils :as utils])
   (:gen-class))
 

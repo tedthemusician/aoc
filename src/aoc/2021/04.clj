@@ -1,7 +1,6 @@
 (ns aoc.2021.04
   (:require [clojure.string :as str]
             [clojure.edn :as edn]
-            [clojure.pprint :refer [pprint]]
             [aoc.utils :as utils])
   (:gen-class))
 
@@ -161,7 +160,6 @@
   (solve groups play-all))
 
 (utils/verify-solutions
-  ; Add an :input key to verify a puzzle input's expected output
   [{:method solve-1 :sample 4512 :input 74320}
    {:method solve-2 :sample 1924 :input 17884}]
   {:value sample}

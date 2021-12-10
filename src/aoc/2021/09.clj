@@ -1,7 +1,5 @@
 (ns aoc.2021.09
-  (:require [clojure.string :as str]
-            [clojure.edn :as edn]
-            [clojure.pprint :refer [pprint]]
+  (:require [clojure.edn :as edn]
             [aoc.utils :as utils])
   (:gen-class))
 
@@ -123,7 +121,6 @@
     (reduce * largest-3-basin-sizes)))
 
 (utils/verify-solutions
-  ; Add an :input key to verify a puzzle input's expected output
   [{:method solve-1 :sample 15 :input 633}
    {:method solve-2 :sample 1134 :input 1050192}]
   {:value sample}
