@@ -57,6 +57,12 @@
 (defn map-vals [f m]
   (into {} (for [[k v] m] [k (f v)])))
 
+(defn fix
+  "Apply f to init until the result no longer changes"
+  [f init]
+  (let [values (iterate f init)]
+    (reduce (fn [acc curr] (if (= acc curr) (reduced acc) curr)) values)))
+
 (defn verify-one-input
   [method input expected]
   (let [output (method input)
