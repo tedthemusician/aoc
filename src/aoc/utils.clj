@@ -95,10 +95,11 @@
 (defn verify-sample
   [method sample-input expected]
   (let [{:keys [value multiple]} sample-input
+        input (or value multiple)
         verification-func (if multiple
                             verify-multiple-inputs
                             verify-one-input)]
-    (verification-func method value expected)))
+    (verification-func method input expected)))
 
 (defn verify-solution
   ([solution sample-input]
