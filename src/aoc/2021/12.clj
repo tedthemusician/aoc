@@ -66,27 +66,44 @@
   [lines]
   (build-graph (map parse-line lines)))
 
-(def small (parse-lines (first samples)))
-(def med (parse-lines (second samples)))
-(def big (parse-lines (last samples)))
+(defn upper-case?
+  "Is a string entirely uppercase?"
+  [s]
+  (= s (str/upper-case s)))
+
+(defn lower-case?
+  "Is a string entirely lowercase?"
+  [s]
+  (= s (str/lower-case s)))
+
+(defn has-lower-dupe?
+  "Does a list of strings contain the same all-lowercase string twice?"
+  [path]
+  (let [strs (filter string? path)
+        lowers (filter lower-case? path)
+        freqs (frequencies lowers)]
+    (some? (ffirst (filter #(= (second %) 2) freqs)))))
 
 (defn available?
   "Is a node available, i.e. is it either :end or uppercase? If allow-lower is
   true, a node can be anything besides :start."
   ([node allow-lower?]
    (or (= :end node)
-       (or allow-lower?
-           (= node (str/upper-case node)))))
+       (and (string? node)
+            (or allow-lower?
+                (upper-case? node)))))
   ([node]
    (available? node false)))
 
 (defn extend-path
-  "Extend `path` through `graph` along all edges that connect to :end or an
-  uppercase node. `path` should be a vector."
-  [graph path]
+  "Extend `path` through `graph` along all edges that satisfy
+  `availability-pred`. `path` should be a vector."
+  [graph path allow-dupe?]
   (if (= :end (last path))
     [path]
-    (let [unavailable-nodes (set (remove available? path))
+    (let [availability-pred #(available? % (and allow-dupe?
+                                               (not (has-lower-dupe? path))))
+          unavailable-nodes (set (remove availability-pred path))
           orig (last path)
           connections (get graph orig)
           destinations (remove #(contains? unavailable-nodes %) connections)]
@@ -95,24 +112,21 @@
 (defn extend-paths
   "Extend all `paths` through `graph` along all edges that connect to :end or an
   uppercase node. `paths` should be a sequence of vectors."
-  [graph paths]
-  (mapcat (partial extend-path graph) paths))
+  [graph paths allow-dupe?]
+  (mapcat #(extend-path graph % allow-dupe?) paths))
 
-(defn solve-1
-  [lines]
+(defn solve
+  [lines allow-dupe?]
   (let [graph (parse-lines lines)
-        paths (utils/fix (partial extend-paths graph) [[:start]])]
+        paths (utils/fix #(extend-paths graph % allow-dupe?) [[:start]])]
     (count paths)))
 
-(solve-1 (first samples))
+(def solve-1 #(solve % false))
 
-(defn solve-2
-  [x]
-  nil)
+(def solve-2 #(solve % true))
 
 (utils/verify-solutions
-  ; Add an :input key to verify a puzzle input's expected output
   [{:method solve-1 :sample [10 19 226] :input 3485}
-   #_ {:method solve-2 :sample [36 103 3509]}]
+   {:method solve-2 :sample [36 103 3509] :input 85062}]
   {:multiple samples}
   (utils/get-lines 2021 12))
