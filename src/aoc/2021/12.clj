@@ -74,10 +74,11 @@
   "Is a node available, i.e. is it either :end or uppercase? If allow-lower is
   true, a node can be anything besides :start."
   ([node allow-lower?]
-  (or (= :end node)
-      (or allow-lower?
-          (= node (str/upper-case node)))))
-  ([node] (available? node false)))
+   (or (= :end node)
+       (or allow-lower?
+           (= node (str/upper-case node)))))
+  ([node]
+   (available? node false)))
 
 (defn extend-path
   "Extend `path` through `graph` along all edges that connect to :end or an
