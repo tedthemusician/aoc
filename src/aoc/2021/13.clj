@@ -1,7 +1,6 @@
 (ns aoc.2021.13
   (:require [clojure.string :as str]
             [clojure.edn :as edn]
-            [clojure.pprint :refer [pprint]]
             [aoc.utils :as utils])
   (:gen-class))
 
@@ -40,8 +39,24 @@
   {:coords (mapv parse-coord coords)
    :folds (map parse-fold folds)})
 
-(def scoords (:coords (parse-groups sample)))
-(def sfolds (:folds (parse-groups sample)))
+(defn show-line
+  [width xs]
+  (apply str (map #(if (contains? (set xs) %) \# \.) (range (inc width)))))
+
+(defn show-matrix
+  [coords]
+  (let [width (apply max (map first coords))
+        height (apply max (map second coords))
+        y-groups (group-by second coords)
+        ]
+    (map (fn [y]
+           (let [xs (map first (get y-groups y []))]
+             (show-line width xs)))
+         (range (inc height)))))
+
+(defn print-matrix
+  [m]
+  (print (str/join "\n" m)))
 
 (defn fold-n
   [index n]
@@ -64,15 +79,21 @@
   (let [{:keys [coords folds]} (parse-groups groups)]
     (count (fold-matrix coords (first folds)))))
 
-(solve-1 sample)
-
 (defn solve-2
-  [x]
-  nil)
+  [groups]
+  (let [{:keys [coords folds]} (parse-groups groups)
+        final-matrix (reduce fold-matrix coords folds)]
+    (show-matrix final-matrix)
+    ; .##..####...##.#..#.#....#..#..##....##
+    ; #..#.#.......#.#.#..#....#..#.#..#....#
+    ; #....###.....#.##...#....#..#.#.......#
+    ; #....#.......#.#.#..#....#..#.#.##....#
+    ; #..#.#....#..#.#.#..#....#..#.#..#.#..#
+    ; .##..####..##..#..#.####..##...###..##.
+    "CEJKLUGJ"))
 
 (utils/verify-solutions
-  ; Add an :input key to verify a puzzle input's expected output
   [{:method solve-1 :sample 17 :input 795}
-   {:method solve-2 :sample :s2}]
+   {:method solve-2 :input "CEJKLUGJ"}]
   {:value sample}
   (utils/get-line-groups 2021 13))
