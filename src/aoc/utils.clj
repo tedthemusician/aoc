@@ -71,7 +71,7 @@
 (defn verify-one-input
   [method input expected]
   (let [output (method input)
-        result {:output (method input)}]
+        result {:output output}]
     (if (some? expected)
       (assoc result
              :expected expected
