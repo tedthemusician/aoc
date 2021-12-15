@@ -54,6 +54,11 @@
   [m]
   (apply mapv vector m))
 
+(defn mapm
+  "Map a function across all values of a matrix."
+  [f m]
+  (mapv (partial mapv f) m))
+
 (defn map-vals [f m]
   (into {} (for [[k v] m] [k (f v)])))
 

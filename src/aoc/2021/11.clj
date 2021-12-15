@@ -15,11 +15,6 @@
              [4 8 4 6 8 4 8 5 5 4] 
              [5 2 8 3 7 5 1 5 2 6]])
 
-(defn mapm
-  "Map a function across all values of a matrix."
-  [f m]
-  (mapv (partial mapv f) m))
-
 (defn f-at
   "Apply `f` to point `p` in matrix `m`"
   [f m {:keys [x y]}]
@@ -80,9 +75,9 @@
   fixed point.  Convert all remaining nils to 0s."
   [m]
   (->> m
-       (mapm inc)
+       (utils/mapm inc)
        (utils/fix tick)
-       (mapm (fnil identity 0))))
+       (utils/mapm (fnil identity 0))))
 
 (defn get-steps
   "Get `n` iterations of `step` applied to matrix `m.`"
