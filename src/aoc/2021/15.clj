@@ -1,6 +1,7 @@
 (ns aoc.2021.15
   (:require [clojure.string :as str]
             [clojure.edn :as edn]
+            [clojure.set :as set]
             [clojure.pprint :refer [pprint]]
             [aoc.utils :as utils])
   (:gen-class))
@@ -16,10 +17,6 @@
              [1 2 9 3 1 3 8 5 2 1]
              [2 3 1 1 9 4 4 5 8 1]])
 
-(defn parse-line
-  [lines]
-  (map edn/read-string (str/split lines #"")))
-
 (defn getm
   [m {:keys [x y]}]
   (nth (nth m y) x))
@@ -30,136 +27,124 @@
         new-row (assoc old-row x v)]
     (assoc m y new-row)))
 
-(defn init
-  [m]
-  (let [blanks (utils/mapm (fn [x]
-                             {:value x :prev nil :weight ##Inf})
-                           m)
-        zero-zero (getm blanks {:x 0 :y 0})
-        grid (assocm blanks {:x 0 :y 0} (assoc zero-zero :weight (:value zero-zero)))]
-    {:matrix grid
-     :width (count (first m))
-     :height (count m)
-     :visited #{}}))
+(defn parse-line
+  [lines]
+  (map edn/read-string (str/split lines #"")))
 
-(def smdata (init sample))
-(def sm (:matrix smdata))
+(def default-point-data
+  {:weight ##Inf
+   :value nil
+   :prev nil})
 
-(def smalldata (init (take 3 (map (partial take 3) sample))))
-
-(defn get-end
-  [{:keys [width height]}]
-  {:x (dec width) :y (dec height)})
+(defn init [m]
+  (let [width (count (first m))
+        height (count m)
+        source (vec (flatten m))]
+    {:source source
+     :width width
+     :height height
+     :end {:x (dec width) :y (dec height)}
+     :visited #{}
+     :known {{:x 0 :y 0} {:weight (first source)
+                          :value (first source)
+                          :prev nil}}}))
 
 (defn get-neighbors
   [{:keys [x y]}]
-  [{:x x :y (inc y)}
-   {:x (inc x) :y y}
-   {:x x :y (dec y)}
-   {:x (dec x) :y y}])
+  [{:x x :y (dec y)}
+   {:x x :y (inc y)}
+   {:x (dec x) :y y}
+   {:x (inc x) :y y}])
 
 (defn get-bounded-neighbors
   [{:keys [width height]} point]
-  (filter (fn [{:keys [x y]}]
-            (and (>= x 0)
-                 (>= y 0)
-                 (< x width)
-                 (< y height)))
+  (filter #(and (>= (:x %) 0)
+                (>= (:y %) 0)
+                (< (:x %) width)
+                (< (:y %) height))
           (get-neighbors point)))
 
-(defn explore-neighbor
-  [matrix curr neighbor]
-  (let [curr-weight (:weight (getm matrix curr))
-        neighbor-data (getm matrix neighbor)
-        weight-from-curr (+ curr-weight (:value neighbor-data))]
-    (if (< weight-from-curr (:weight neighbor-data))
-      (let [new-neighbor-data (assoc neighbor-data
-                                     :weight weight-from-curr
-                                     :prev curr)]
-        (assocm matrix neighbor new-neighbor-data))
-      matrix)))
+(defn point->index
+  [{:keys [width]} {:keys [x y]}]
+  (+ x (* width y)))
 
-(defn explore-neighbors
-  [mdata curr]
-  (let [neighbors (get-bounded-neighbors mdata curr)
-        new-matrix (reduce (fn [m neighbor]
-                             (explore-neighbor m curr neighbor))
-                           (:matrix mdata)
-                           neighbors)]
-    (assoc mdata
-           :matrix new-matrix
-           :visited (conj (:visited mdata) curr))))
+(defn index->point
+  [{:keys [width]} i]
+  {:x (mod i width)
+   :y (quot i width)})
 
-(defn get-lightest-node
-  [{:keys [matrix width height visited] :as mdata}]
-  (loop [y 0, min-weight ##Inf, best {:x 0 :y 0}]
-    (if (= y height)
-      best
-      (let [{:keys [x weight]} (loop [x 0, min-row-weight ##Inf, best-x nil]
-                                 (if (= x width)
-                                   {:x best-x :weight min-row-weight}
-                                   (let [curr {:x x :y y}
-                                         {:keys [weight]} (getm matrix curr)]
-                                     (if (and
-                                           (not (contains? visited curr))
-                                           (< weight min-row-weight))
-                                       (recur (inc x) weight x)
-                                       (recur (inc x) min-row-weight best-x)))))]
-        (if (< weight min-weight)
-          (recur (inc y) weight {:x x :y y})
-          (recur (inc y) min-weight best))))))
+(defn visited?
+  [mdata point]
+  (contains? (:visited mdata) point))
 
-(defn iter
-  [{:keys [curr mdata]}]
-  (let [{:keys [width height]} mdata
-        lightest-node (get-lightest-node mdata)
-        mdata' (explore-neighbors mdata lightest-node)]
-    {:curr lightest-node :mdata mdata'}))
+(defn add-visited
+  [mdata point]
+  (update-in mdata [:visited] #(conj % point)))
 
-(defn finished?
-  [{:keys [matrix] :as mdata}]
-  (let [end (get-end mdata)
-        {:keys [weight]} (getm matrix end)]
-    (< weight ##Inf)))
+(defn get-point-data
+  [mdata point]
+  (if-let [existing (get-in mdata [:known point])]
+    existing
+    (assoc default-point-data :value (nth (:source mdata) (point->index mdata point)))))
 
-(defn retrace
-  [{:keys [matrix] :as mdata}]
-  (let [end (get-end mdata)]
-    (loop [curr end, path (list)]
-      (let [{:keys [prev]} (getm matrix curr)]
-        (if (nil? prev)
-          path
-          (recur prev (conj path curr)))))))
+(defn set-point-data
+  [mdata point pdata]
+  (assoc-in mdata [:known point] (merge (get-point-data mdata point) pdata)))
 
-(defn find-shortest-path
-  [m]
-  (let [mdata (init m)
-        start {:x 0 :y 0}
-        iterations (iterate iter {:curr start :mdata mdata})
-        finished-iteration (first (drop-while #(not (finished? (:mdata %))) iterations))]
-    (retrace (:mdata finished-iteration))))
+(defn probe
+  [mdata point pdata neighbor]
+  (let [ndata (get-point-data mdata neighbor)
+        weight (+ (:value ndata) (:weight pdata))]
+    (if (< weight (:weight ndata))
+      (set-point-data mdata neighbor {:weight weight
+                                      :prev point})
+      mdata)))
 
-(defn get-path
-  [m]
-  (let [end (last (last m))]
-    (loop [curr end, points (list end)]
-      (if-let [prev (:prev curr)]
-        (recur (getm m prev) (conj points prev))
-        points))))
+(def md (init sample))
+
+(defn visit
+  [mdata point]
+  (let [pdata (get-point-data mdata point)
+        neighbors (get-bounded-neighbors mdata point)
+        probed (reduce (fn [mdata' neighbor]
+                         (probe mdata' point pdata neighbor))
+                       mdata
+                       neighbors)]
+    (add-visited probed point)))
+
+(defn get-lightest-known
+  [{:keys [known visited] :as mdata}]
+  (let [unvisited-known-points (seq (apply dissoc known visited))
+        sorted-points (sort-by (comp :weight second) unvisited-known-points)]
+    (ffirst sorted-points)))
+
+(defn visit-lightest-known
+  [mdata]
+  (visit mdata (get-lightest-known mdata)))
+
+(defn searching?
+  [{:keys [visited end]}]
+  (not (contains? visited end)))
+
+(defn visit-all-until-end
+  [mdata]
+  (let [iterations (iterate visit-lightest-known mdata)]
+    (first (drop-while searching? iterations))))
 
 (defn solve-1
   [m]
-  (let [points (find-shortest-path m)
-        values (map (partial getm m) points)]
-    (reduce + values)))
+  (let [mdata (init m)
+        origin-value (:value (get-point-data mdata {:x 0 :y 0}))
+        {:keys [known]} (visit-all-until-end mdata)
+        destination-weight (:weight (get known (:end mdata)))]
+    (- destination-weight origin-value)))
 
 (defn solve-2
   [x]
   nil)
 
 (utils/verify-solutions
-  ; Add an :input key to verify a puzzle input's expected output
-  [{:method solve-1 :sample 40}
+  [{:method solve-1 :sample 40 :input 717}
    #_ {:method solve-2 :sample :s2}]
   {:value sample}
-  #_ (map parse-line (utils/get-lines 2021 15)))
+  (map parse-line (utils/get-lines 2021 15)))
