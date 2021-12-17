@@ -40,11 +40,6 @@
   "Read the rows of a board"
   (partial map read-row))
 
-(defn read-input
-  [groups]
-  {:picked (read-picked (ffirst groups))
-   :boards (map (comp init-board-state read-board) (rest groups))})
-
 (defn init-board-state
   "Convert a seq of numbers to a seq of maps of numbers and marked states"
   [board]
@@ -52,6 +47,11 @@
          (map (fn [num] {:value num :marked false})
               nums))
        board))
+
+(defn read-input
+  [groups]
+  {:picked (read-picked (ffirst groups))
+   :boards (map (comp init-board-state read-board) (rest groups))})
 
 (defn update-square
   "Mark square iff its value is n"
