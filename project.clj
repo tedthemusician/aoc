@@ -9,4 +9,5 @@
                  [digest "1.4.10"]]
   :main ^:skip-aot aoc.core
   :target-path "target/%s"
+  :jvm-opts ["-Xmx1g"]
   :profiles {:uberjar {:aot :all}})
