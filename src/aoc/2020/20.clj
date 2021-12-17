@@ -192,9 +192,6 @@
 (def strip-edges (comp (partial map strip-ends) strip-ends))
 (def strip-borders (partial map (partial map strip-edges)))
 
-(def cells (first (strip-borders arranged)))
-(def num-rows 8)
-
 (defn merge-cells
   "Merge the tiles in a tile row into a single list of pixel rows"
   [cells]
