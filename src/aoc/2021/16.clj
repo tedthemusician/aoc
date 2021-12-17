@@ -5,14 +5,14 @@
             [aoc.utils :as utils])
   (:gen-class))
 
-(def diy-samples ["D2FE28"
-                  "38006F45291200"
-                  "EE00D40C823060"])
-
-(def samples ["8A004A801A8002F478"
-              "620080001611562C8802118E34"
-              "C0015000016115A2E0802F182340"
-              "A0016C880162017C3686B18A3D4780"])
+(def samples ["C200B40A82"
+              "04005AC33890"
+              "880086C3E88112"
+              "CE00C43D881120"
+              "D8005AC2A8F0"
+              "F600BC2D8F"
+              "9C005AC2F8F0"
+              "9C0141080250320F1802104A08"])
 
 (defn read-hex-digit
   [d]
@@ -28,13 +28,33 @@
 
 (defn get-value
   [bits]
-  (int (reduce-kv (fn [acc index curr]
-                    (+ acc (* curr (Math/pow 2 index))))
-                  0
-                  (vec (reverse bits)))))
+  (let [value (reduce-kv (fn [acc index curr]
+                (+ acc (* curr (Math/pow 2 index))))
+              0
+              (vec (reverse bits)))]
+    (if (> value (Integer/MAX_VALUE))
+      (bigint value)
+      (int value))))
 
 (def packet-type-ids
-  {4 :literal})
+  [:sum
+   :product
+   :minimum
+   :maximum
+   :literal
+   :greater-than
+   :less-than
+   :equal-to])
+
+(def packet-ops
+  {:sum +
+   :product *
+   :minimum min
+   :maximum max
+   :literal identity
+   :greater-than #(if (> %1 %2) 1 0)
+   :less-than #(if (< %1 %2) 1 0)
+   :equal-to #(if (= %1 %2) 1 0)})
 
 (def literal-modes
   [:literal-end
@@ -90,7 +110,7 @@
    :packet-type-id {:len 3
                     :func (fn [packet bits]
                             (let [value (get-value bits)
-                                  packet-type-id (get packet-type-ids value :unknown)
+                                  packet-type-id (nth packet-type-ids value)
                                   next-mode (if (= packet-type-id :literal)
                                               :literal-prefix
                                               :length-type-id)]
@@ -106,9 +126,15 @@
    :literal-group {:len 4
                    :func (partial add-bits :literal-prefix)}
    :literal-end {:len 4
-                 :func (partial add-bits :fixed)}
+                 :func (partial add-bits :done)}
+   :done {:len 0
+          :func (fn [packet bits]
+                  (-> packet
+                      (update :content get-value)
+                      (assoc :mode :fixed)))
+          }
    :fixed {:len 0
-          :func (fn [packet bits] packet)}
+           :func (fn [packet bits] packet)}
    ;
    ; OPERATIONS
    ;
@@ -116,7 +142,7 @@
                     :func (fn [packet [bit]]
                             (assoc packet :mode (nth length-modes bit)))}
    :subpackets-len {:len 15
-                  :func (partial set-packet-len-mode :bit-pool)}
+                    :func (partial set-packet-len-mode :bit-pool)}
    :subpacket-count {:len 11
                      :func (partial set-packet-len-mode :countdown)}
    ;
@@ -167,11 +193,19 @@
   [packet]
   (utils/fix exec-current-mode packet))
 
+(defn strip-packet
+  [packet]
+  (let [{:keys [content type-id]} packet]
+    {:op type-id
+     :content (if (literal? packet)
+                content
+                (map strip-packet content))}))
+
 (defn show-packet
   [packet]
   (let [{:keys [bits content type-id]} packet
         shown-content (if (literal? packet)
-                        (str/join content)
+                        content
                         (map show-packet content))]
     (-> packet
         (update :bits str/join)
@@ -185,20 +219,28 @@
                       (reduce + (map sum-version-numbers content)))]
     (+ version content-sum)))
 
-(defn solve-1
-  [text]
+(defn evaluate
+  [stripped-packet]
+  (let [{:keys [op content]} stripped-packet
+        func (get packet-ops op)]
+    (if (= op :literal)
+      content
+      (apply func (map evaluate content)))))
+
+(defn solve
+  [f text]
   (->> text
        get-string-bits
        init-packet
        consume-all
-       sum-version-numbers))
+       f))
 
-(defn solve-2
-  [x]
-  nil)
+(def solve-1 (partial solve sum-version-numbers))
+
+(def solve-2 (partial solve (comp evaluate strip-packet)))
 
 (utils/verify-solutions
-  [{:method solve-1 :sample [16 12 23 31] :input 871}
-   #_ {:method solve-2 :sample :s2}]
+  [{:method solve-1 :input 871}
+   {:method solve-2 :sample [3 54 7 9 1 0 0 1] :input 68703010504}]
   {:multiple samples}
   (utils/get-text 2021 16))
