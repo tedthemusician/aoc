@@ -23,7 +23,7 @@
   [year day]
   (let [basename (format "%02d" day)
         fname (str "./resources/" year "/" basename ".txt")]
-    (slurp fname)))
+    (str/trim (slurp fname))))
 
 (def get-lines (comp str/split-lines (partial get-text)))
 
