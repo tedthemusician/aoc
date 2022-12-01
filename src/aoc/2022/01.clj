@@ -2,14 +2,29 @@
   (:require [aoc.utils :as utils])
   (:gen-class))
 
-(def sample nil)
+(def sample [[1000 2000 3000]
+             [4000]
+             [5000 6000]
+             [7000 8000 9000]
+             [10000]])
 
-(def solve-1 identity)
+(defn solve-1
+  [nums]
+  (->> nums
+       (map (partial reduce +))
+       (apply max)))
 
-(def solve-2 identity)
+(defn solve-2
+  [nums]
+  (->> nums
+       (map (partial reduce +))
+       sort
+       reverse
+       (take 3)
+       (reduce +)))
 
 (utils/verify-solutions
-  [{:method solve-1 :sample nil :input nil}
-   #_ {:method solve-2 :sample nil :input nil}]
+  [{:method solve-1 :sample 24000 :input 68802}
+   {:method solve-2 :sample 45000 :input 205370}]
   {:value sample}
-  (utils/get-read-lines 2022 1))
+  (utils/get-read-groups 2022 1))
