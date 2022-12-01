@@ -36,6 +36,11 @@
 
 (def get-line-groups (comp lines->groups (partial get-lines)))
 
+(defn get-read-groups
+  "Get line grous and parse each group's line as edn"
+  [year day]
+  (map  #(map edn/read-string %1) (get-groups year day)))
+
 (defn indices
   "Get the indices of elements in [coll] that satisfy [pred]"
   [pred coll]
