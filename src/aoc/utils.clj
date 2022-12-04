@@ -52,8 +52,10 @@
 
 (defn parse-nums
   "Parse a comma-separated list of numbers"
-  [s]
-  (map edn/read-string (str/split s #",")))
+  ([s d]
+   (map edn/read-string (str/split s (re-pattern d))))
+  ([s]
+   (parse-nums s ",")))
 
 (defn transpose
   [m]

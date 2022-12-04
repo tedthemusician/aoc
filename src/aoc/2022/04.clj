@@ -13,7 +13,7 @@
 (defn parse-range
   "Parse a hyphen-delimited range"
   [s]
-  (map edn/read-string (str/split s #"-")))
+  (utils/parse-nums s "-"))
 
 (defn parse-line
   "Parse a commo-delimited duplet of ranges"
