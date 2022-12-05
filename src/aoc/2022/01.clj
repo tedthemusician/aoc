@@ -19,8 +19,7 @@
   (->> nums
        (map (partial reduce +))
        sort
-       reverse
-       (take 3)
+       (take-last 3)
        (reduce +)))
 
 (utils/verify-solutions
