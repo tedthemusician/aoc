@@ -26,7 +26,6 @@
   (let [known-crates (map (comp parse-crate
                                 (partial take 3))
                           (partition-all 4 s))]
-    
     (take max-len (concat known-crates (repeat nil)))))
 
 (defn parse-stacks
@@ -44,7 +43,7 @@
   [lines]
   (let [nums (str/split (str/trim (last lines)) #" ")
         len (edn/read-string (last nums))]
-    
+
     (parse-stacks len (butlast lines))))
 
 (defn parse-instruction
@@ -67,8 +66,8 @@
   [stacks origin dest]
   (let [[item] (nth stacks origin)]
     (-> stacks
-    (update origin rest)
-    (update dest #(cons item %)))))
+        (update origin rest)
+        (update dest #(cons item %)))))
 
 (defn move-crates-serially
   "Move ncrates one at time from origin to dest"
