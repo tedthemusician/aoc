@@ -1,4 +1,4 @@
-(ns aoc.2021.03
+(ns aoc.2022.03
   (:require [aoc.utils :as utils]
             [clojure.set :as set])
   (:gen-class))

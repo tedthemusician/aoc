@@ -1,4 +1,4 @@
-(ns aoc.2021.01
+(ns aoc.2022.01
   (:require [aoc.utils :as utils])
   (:gen-class))
 

@@ -1,4 +1,4 @@
-(ns aoc.2021.02
+(ns aoc.2022.02
   (:require [aoc.utils :as utils]
             [clojure.set :refer [map-invert]])
   (:gen-class))
