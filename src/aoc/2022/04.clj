@@ -50,6 +50,6 @@
 
 (utils/verify-solutions
   [{:method solve-1 :sample 2 :input 515}
-   {:method solve-2 :sample 4}]
+   {:method solve-2 :sample 4 :input 883}]
   {:value sample}
   (utils/get-lines 2022 4))
