@@ -27,6 +27,6 @@
 
 (utils/verify-solutions
   [{:method solve-1 :sample [7 5 6 10 11] :input 1816}
-   {:method solve-2 :sample [19 23 23 29 26]}]
+   {:method solve-2 :sample [19 23 23 29 26] :input 2625}]
   {:multiple samples}
   (utils/get-text 2022 6))
