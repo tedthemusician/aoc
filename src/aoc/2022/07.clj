@@ -1,6 +1,5 @@
 (ns aoc.2022.07
-  (:require [aoc.utils :as utils]
-            [clojure.set :refer [map-invert]])
+  (:require [aoc.utils :as utils])
   (:gen-class))
 
 (def sample ["$ cd /"
