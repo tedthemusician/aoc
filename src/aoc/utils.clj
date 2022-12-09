@@ -75,6 +75,10 @@
   (let [values (iterate f init)]
     (reduce (fn [acc curr] (if (= acc curr) (reduced acc) curr)) values)))
 
+(defn abs
+  [n]
+  (max n (- n)))
+
 (defn verify-one-input
   [method input expected]
   (let [output (method input)
