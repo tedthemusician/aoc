@@ -43,7 +43,6 @@
   [lines]
   (let [nums (str/split (str/trim (last lines)) #" ")
         len (edn/read-string (last nums))]
-
     (parse-stacks len (butlast lines))))
 
 (defn parse-instruction

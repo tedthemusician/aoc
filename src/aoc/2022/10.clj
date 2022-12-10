@@ -112,6 +112,6 @@
   [{:method solve-1 :sample 13140 :input 13220}
    {:method solve-2
     :sample (str/join "\n" (get-resource-lines "10-part-2-sample-solution"))
-    :input (str/join "\n"(get-resource-lines "10-part-2-input-solution"))}]
+    :input (str/join "\n" (get-resource-lines "10-part-2-input-solution"))}]
   {:value sample}
   (utils/get-lines 2022 10))
