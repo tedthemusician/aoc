@@ -2,8 +2,7 @@
   (:require [aoc.utils :as utils]
             [clojure.string :as str]
             [clojure.set :as set]
-            [clojure.edn :as edn]
-            [clojure.pprint :refer [pprint]])
+            [clojure.edn :as edn])
   (:gen-class))
 
 (def samples [["R 4"
