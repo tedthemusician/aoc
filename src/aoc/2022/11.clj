@@ -91,33 +91,33 @@
 
 (def s (mapv parse-monkey sample))
 
-(defn apply-op
+(defn apply-op-to-scalar
   "Apply an operation to terms, substituting :old with n"
   [n op terms]
   (let [func (ops op)]
     (apply func (map (fn [term] (if (= :old term) n term)) terms))))
 
-(defn update-worry-level
+(defn update-scalar-worry-level
   "Update the worry level of the first item in a monkey's list of items"
   [{:keys [items expression] :as monkey}]
   (let [[item] items
         {:keys [op terms]} expression
-        new-level (apply-op item op terms)]
+        new-level (apply-op-to-scalar item op terms)]
     (assoc-in monkey [:items 0] (quot new-level 3))))
 
-(defn test-worry-level
+(defn test-scalar-worry-level
   "Test whether the worry level of a monkey's first item is divisible by its
   modulus"
   [{:keys [items modulus]}]
   (zero? (mod (first items) modulus)))
 
-(defn throw-next-item
+(defn throw-next-scalar-item
   "Throw the first item from the monkey at monkey-index to its appropriate
   target"
   [source-index monkeys]
-  (let [source-monkey (update-worry-level (nth monkeys source-index))
+  (let [source-monkey (update-scalar-worry-level (nth monkeys source-index))
         [thrown-item] (:items source-monkey)
-        default? (test-worry-level source-monkey)
+        default? (test-scalar-worry-level source-monkey)
         target-key (if default? :default-target :alternative-target)
         target-index (get source-monkey target-key)]
     (-> monkeys
@@ -125,23 +125,23 @@
         (update-in [source-index :nticks] inc)
         (update-in [target-index :items] #(conj % thrown-item)))))
 
-(defn take-turn
+(defn take-turn-with-scalars
   "Throw all items from the monkey at monkey-index to their appropriate
   targets"
   [monkeys source-index]
   (let [source-monkey (nth monkeys source-index)
         nitems (count (:items source-monkey))]
-    (nth (iterate (partial throw-next-item source-index) monkeys) nitems)))
+    (nth (iterate (partial throw-next-scalar-item source-index) monkeys) nitems)))
 
-(defn play-round
+(defn play-round-with-scalars
   "All monkeys throw all their items"
   [monkeys]
-  (reduce take-turn monkeys (range (count monkeys))))
+  (reduce take-turn-with-scalars monkeys (range (count monkeys))))
 
 (defn solve-1
   [input]
   (let [monkeys (mapv parse-monkey input)
-        final-state (nth (iterate play-round monkeys) 20)]
+        final-state (nth (iterate play-round-with-scalars monkeys) 20)]
     (->> final-state
          (map :nticks)
          sort
@@ -149,14 +149,12 @@
          (take 2)
          (apply *))))
 
-(solve-1 sample)
-
 (defn solve-2
   [input]
   ())
 
 (utils/verify-solutions
-  [{:method solve-1 :sample 10605}
+  [{:method solve-1 :sample 10605 :input 58786}
    #_ {:method solve-2 :sample nil :input nil}]
   {:value sample}
   (utils/get-groups 2022 11))
