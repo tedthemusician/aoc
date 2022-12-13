@@ -85,17 +85,17 @@
     (- h2 h1)))
 
 (defn get-reachable-neighbors
-  "Get the neighbors of a given point that differ by 1 or 0"
-  [m point]
+  "Get the neighbors of a given point that differ according to reachability-pred"
+  [reachability-pred m point]
   (let [level (get-at m point)
         neighbors (get-neighbor-points m point)]
-    (set (filter #(<= (get-height-difference m point %) 1) neighbors))))
+    (set (filter #(reachability-pred (get-height-difference m point %)) neighbors))))
 
 (defn initialize-connections
   "Create a mapping of points to reachable neighbors"
-  [m]
+  [reachability-pred m]
   (let [points (get-points m)
-        neighbors (map (partial get-reachable-neighbors m) points)]
+        neighbors (map (partial get-reachable-neighbors reachability-pred m) points)]
     (zipmap points neighbors)))
 
 (defn explore-farthest
@@ -107,7 +107,7 @@
         new-points (set/difference reachable-points known-points)]
     (conj distance-groups new-points)))
 
-(defn explore-forever
+(defn explore-all
   "Explore a matrix via its connections along all paths"
   [connections origin]
   (->> [#{origin}]
@@ -118,18 +118,23 @@
 (defn solve-1
   [input]
   (let [{:keys [matrix start end]} (parse-input input)
-        connections (initialize-connections matrix)
-        distance-groups (explore-forever connections start)]
+        reachability-pred #(<= % 1)
+        connections (initialize-connections reachability-pred matrix)
+        distance-groups (explore-all connections start)]
     (utils/find-index #(% end) distance-groups)))
-
-(solve-1 sample)
 
 (defn solve-2
   [input]
-  ())
+  (let [{:keys [matrix start end]} (parse-input input)
+        reachability-pred #(>= % -1)
+        connections (initialize-connections reachability-pred matrix)
+        distance-groups (explore-all connections end)]
+    (utils/find-index (fn [points]
+                        (some #(zero? (get-at matrix %)) points))
+                      distance-groups)))
 
 (utils/verify-solutions
-  [{:method solve-1 :sample 31}
-   #_ {:method solve-2 :sample nil :input nil}]
+  [{:method solve-1 :sample 31 :input 468}
+   {:method solve-2 :sample 29 :input 459}]
   {:value sample}
   (utils/get-lines 2022 12))
