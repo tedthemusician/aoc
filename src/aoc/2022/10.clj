@@ -12,7 +12,7 @@
        str/trim
        str/split-lines))
 
-(def sample (get-resource-liens "10-long-sample"))
+(def sample (get-resource-lines "10-long-sample"))
 
 (def initial-screen (vec (repeat 6 (vec (repeat 40 0)))))
 
