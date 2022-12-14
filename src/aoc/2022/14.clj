@@ -39,17 +39,29 @@
   [[x y]]
   (map #(vector (% x) (inc y)) [identity dec inc]))
 
-(defn drop-grain-1
-  "Drop a grain until it can no longer move. If it falls indefinitely, return
-  nil."
-  [max-y covered-points [x y :as pos]]
-  (if (> y max-y)
-    nil
+(defn drop-grain
+  "Drop grain until stop-cond is met; return result of stop-result applied to
+  pos"
+  [stop-cond stop-result max-y covered-points [x y :as pos]]
+  (if (stop-cond max-y pos)
+    (stop-result pos)
     (let [candidates (get-candidates pos)
           new-point (utils/first-by #(not (contains? covered-points %)) candidates)]
       (if (nil? new-point)
         pos
-        (recur max-y covered-points new-point)))))
+        (recur stop-cond stop-result max-y covered-points new-point)))))
+
+(def drop-grain-1
+  (partial drop-grain
+           (fn [max-y [x y]]
+             (> y max-y))
+           (constantly nil)))
+
+(def drop-grain-2
+  (partial drop-grain
+           (fn [max-y [x y]]
+             (>= y max-y))
+           identity))
 
 (defn pour-sand-1
   "Pour sand until grains start to fall indefinitely"
@@ -60,17 +72,6 @@
         (if (nil? new-grain)
           grains
           (recur (conj grains new-grain)))))))
-
-(defn drop-grain-2
-  "Drop a grain until it reaches the maximum depth"
-  [max-y covered-points [x y :as pos]]
-  (if (>= y max-y)
-    pos
-    (let [candidates (get-candidates pos)
-          new-point (utils/first-by #(not (contains? covered-points %)) candidates)]
-      (if (nil? new-point)
-        pos
-        (recur max-y covered-points new-point)))))
 
 (defn pour-sand-2
   "Drop sand until it reaches the origin"
@@ -83,19 +84,15 @@
           new-grains
           (recur new-grains))))))
 
-(defn solve-1
-  [input]
+(defn solve
+  [pour-func input]
   (->> input
        parse-input
-       pour-sand-1
+       pour-func
        count))
 
-(defn solve-2
-  [input]
-  (->> input
-       parse-input
-       pour-sand-2
-       count))
+(def solve-1 (partial solve pour-sand-1))
+(def solve-2 (partial solve pour-sand-2))
 
 (utils/verify-solutions
   [{:method solve-1 :sample 24 :input 964}
