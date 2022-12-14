@@ -50,6 +50,10 @@
   [pred coll]
   (first (indices pred coll)))
 
+(defn first-by
+  [pred coll]
+  (first (filter pred coll)))
+
 (defn parse-nums
   "Parse a comma-separated list of numbers"
   ([s d]
