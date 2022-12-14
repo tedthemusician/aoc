@@ -87,8 +87,6 @@
         (map inc)
         (reduce *))))
 
-(solve-2 sample)
-
 (utils/verify-solutions
   [{:method solve-1 :sample 13 :input 6568}
    {:method solve-2 :sample 140 :input 19493}]
