@@ -20,13 +20,23 @@
              "Sensor at x=14, y=3: closest beacon is at x=15, y=3"
              "Sensor at x=20, y=1: closest beacon is at x=15, y=3"])
 
+(defn get-distance
+  "Get the Manhattan distance between two points"
+  [[x1 y1] [x2 y2]]
+  (+ (utils/abs (- x1 x2)) (utils/abs (- y1 y2))))
+
+(defn assoc-radius
+  "Assoc an input line's radius with its sensor and beacon points"
+  [{:keys [sensor beacon] :as points}]
+  (assoc points :radius (get-distance sensor beacon)))
+
+(def input-re #"^Sensor at x=(.+), y=(.+): closest beacon is at x=(.+), y=(.+)$")
+
 (defn parse-line
   "Get the sesnor point and closest-beacon point from a line"
   [line]
-  (let [[sx sy bx by] (map edn/read-string
-                           (rest (re-matches #"^Sensor at x=(.+), y=(.+): closest beacon is at x=(.+), y=(.+)$"
-                                             line)))]
-    {:sensor [sx sy], :beacon [bx, by]}))
+  (let [[sx sy bx by] (map edn/read-string (rest (re-matches input-re line)))]
+    (assoc-radius {:sensor [sx sy], :beacon [bx, by]})))
 
 (defn parse-input
   "Given a map with keys :row and :input, update :input by mapping parse-line"
@@ -35,27 +45,16 @@
 
 (def i (:input (parse-input {:row 10 :input sample})))
 
-(defn get-distance
-  "Get the Manhattan distance between two points"
-  [[x1 y1] [x2 y2]]
-  (+ (utils/abs (- x1 x2)) (utils/abs (- y1 y2))))
-
 (defn get-row-at
   "Given the position of a sensor, the distance to its nearest beacon, and a
   y-value, return the x bounds of that sensor's coverage"
-  [[point-x point-y] distance row-y]
-  (let [dy (utils/abs (- point-y row-y))
-        radius (- distance dy)]
-    [(- point-x radius) (+ point-x radius)]))
-
-(defn get-ranges-by-row
-  "Given a map of a sensor and its nearest beacon, return a mapping from
-  y-value to x bounds"
-  [{:keys [sensor beacon]}]
+  [row-y {:keys [sensor radius]}]
   (let [[sensor-x sensor-y] sensor
-        distance (get-distance sensor beacon)
-        ys (range (- sensor-y distance) (inc (+ sensor-y distance)))]
-    (zipmap ys (map (partial get-row-at sensor distance) ys))))
+        dy (utils/abs (- sensor-y row-y))
+        distance (- radius dy)]
+    (if (> dy radius)
+      nil
+      [(- sensor-x distance) (+ sensor-x distance)])))
 
 (defn contiguous-or-overlapping?
   "Are two ranges either contiguous or overlapping?"
@@ -71,7 +70,7 @@
 (defn merge-all-ranges
   "Given a list of ranges, merge all that overlap"
   [ranges]
-  (let [[r & rs] (sort ranges)]
+  (let [[r & rs] (sort (remove nil? ranges))]
     (loop [merged (list r), remaining rs]
       (if (empty? remaining)
         (reverse merged)
@@ -96,41 +95,13 @@
 (defn solve-1-fast
   [{:keys [row input]}]
   (->> input
-       (map (comp (fn [{:keys [sensor beacon]}]
-                    (get-row-at sensor (get-distance sensor beacon) row))
-                  parse-line))
+       (map (comp (partial get-row-at row) parse-line))
        merge-all-ranges
        (map #(utils/abs (- (second %) (first %))))
        (reduce +)))
 
-(defn solve-1-complete
-  [{:keys [row input]}]
-  (->> input
-     (map (comp #(get % row) get-ranges-by-row parse-line))
-     (remove nil?)
-     merge-all-ranges
-     (map #(utils/abs (- (second %) (first %))))
-     (reduce +)))
-
-(defn solve-2
-  [{:keys [maximum input]}]
-  (let [ranges-by-row-by-sensor (map (comp get-ranges-by-row parse-line) input)
-        ranges-in-bounds (map (partial keep-in-bounds maximum) ranges-by-row-by-sensor)
-        rows (distinct (mapcat keys ranges-in-bounds))
-
-        ranges-by-row (zipmap rows
-                              (map (fn [row]
-                                     (sort
-                                       (remove nil?
-                                               (map #(get % row) ranges-in-bounds))))
-                                   rows))
-        merged-ranges-by-row (utils/map-vals merge-all-ranges ranges-by-row)
-        [[y [r1 r2]]] (filter #(= 2 (count (second %))) merged-ranges-by-row)
-        missing-x (inc (second r1)) ]
-    (+ y (* missing-x 4000000))))
-
 (utils/verify-solutions
   [{:method solve-1-fast :sample 26 :input 5716881}
-   {:method solve-2 :sample 56000011}]
+   #_ {:method solve-2 :sample 56000011}]
   {:value {:row 10 :maximum 20 :input sample}}
-  {:row 2000000 :maximum 4000000 :input (utils/get-lines 2022 15)})
+  #_ {:row 2000000 :maximum 4000000 :input (utils/get-lines 2022 15)})
