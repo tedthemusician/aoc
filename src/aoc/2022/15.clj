@@ -1,8 +1,6 @@
 (ns aoc.2022.15
   (:require [aoc.utils :as utils]
-            [clojure.string :as str]
-            [clojure.edn :as edn]
-            [clojure.set :as set])
+            [clojure.edn :as edn])
   (:gen-class))
 
 (def sample ["Sensor at x=2, y=18: closest beacon is at x=-2, y=15"
@@ -37,13 +35,6 @@
   [line]
   (let [[sx sy bx by] (map edn/read-string (rest (re-matches input-re line)))]
     (assoc-radius {:sensor [sx sy], :beacon [bx, by]})))
-
-(defn parse-input
-  "Given a map with keys :row and :input, update :input by mapping parse-line"
-  [input]
-  (update input :input (partial map parse-line)))
-
-(def i (:input (parse-input {:row 10 :input sample})))
 
 (defn get-row-at
   "Given the position of a sensor, the distance to its nearest beacon, and a
@@ -97,12 +88,6 @@
   [hi ranges]
   (filter (partial range-in-bounds? hi) ranges))
 
-(defn entry-has-multiple?
-  "Does an entry in a map whose values are collections have multiple items in
-  that collection?"
-  [[k v]]
-  (> 1 (count v)))
-
 (defn solve-1
   [{:keys [row input]}]
   (->> input
@@ -113,17 +98,20 @@
 
 (defn solve-2
   [{:keys [maximum input]}]
-  (let [sensors (map parse-line input)
-        ys (range (inc maximum))
-        ranges (zipmap ys (map #(get-ranges-at-row % sensors) ys))
-        ranges-in-bounds (utils/map-vals (partial keep-in-bounds maximum) ranges)
-        [row-with-multiple-ranges] (filter #(> (count (second %)) 1) ranges-in-bounds)
-        [y [r1 r2]] row-with-multiple-ranges
-        x (inc (second r1))]
-    (+ y (* x 4000000))))
+  (let [sensors (map parse-line input)]
+    (loop [y 0]
+      (if (> y maximum)
+        "FAILURE"
+        (let [ranges (get-ranges-at-row y sensors)
+              ranges-in-bounds (keep-in-bounds maximum ranges)]
+          (if (> (count ranges-in-bounds) 1)
+            (let [[r1 r2] ranges-in-bounds
+                  x (inc (second r1))]
+              (+ y (* 4000000 x)))
+            (recur (inc y))))))))
 
 (utils/verify-solutions
   [{:method solve-1 :sample 26 :input 5716881}
-   {:method solve-2 :sample 56000011}]
+   {:method solve-2 :sample 56000011 :input 10852583132904}]
   {:value {:row 10 :maximum 20 :input sample}}
   {:row 2000000 :maximum 4000000 :input (utils/get-lines 2022 15)})
