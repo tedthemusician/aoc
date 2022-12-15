@@ -83,6 +83,10 @@
   [n]
   (max n (- n)))
 
+(defn clamp
+  [lo hi n]
+  (min hi (max lo n)))
+
 (defn verify-one-input
   [method input expected]
   (let [output (method input)
