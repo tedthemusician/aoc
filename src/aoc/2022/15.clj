@@ -70,16 +70,28 @@
 
 (defn merge-all-ranges
   "Given a list of ranges, merge all that overlap"
-  [[r & rs]]
-  (loop [merged (list r), remaining rs]
-    (if (empty? remaining)
-      (reverse merged)
-      (let [r1 (first merged)
-            [r2 & remaining'] remaining
-            merged' (if (contiguous-or-overlapping? r1 r2)
-                      (cons (merge-two-ranges r1 r2) (rest merged))
-                      (cons r2 merged))]
-        (recur merged' remaining')))))
+  [ranges]
+  (let [[r & rs] (sort ranges)]
+    (loop [merged (list r), remaining rs]
+      (if (empty? remaining)
+        (reverse merged)
+        (let [r1 (first merged)
+              [r2 & remaining'] remaining
+              merged' (if (contiguous-or-overlapping? r1 r2)
+                        (cons (merge-two-ranges r1 r2) (rest merged))
+                        (cons r2 merged))]
+          (recur merged' remaining'))))))
+
+(defn entry-in-bounds?
+  [hi [row x-range]]
+  (and (>= row 0)
+       (<= row hi)
+       (some #(>= % 0) x-range)
+       (some #(<= % hi) x-range)))
+
+(defn keep-in-bounds
+  [hi rows]
+  (into {} (filter (partial entry-in-bounds? hi)) rows))
 
 (defn solve-1-fast
   [{:keys [row input]}]
@@ -87,7 +99,6 @@
        (map (comp (fn [{:keys [sensor beacon]}]
                     (get-row-at sensor (get-distance sensor beacon) row))
                   parse-line))
-       sort
        merge-all-ranges
        (map #(utils/abs (- (second %) (first %))))
        (reduce +)))
@@ -97,13 +108,29 @@
   (->> input
      (map (comp #(get % row) get-ranges-by-row parse-line))
      (remove nil?)
-     sort
      merge-all-ranges
      (map #(utils/abs (- (second %) (first %))))
      (reduce +)))
 
+(defn solve-2
+  [{:keys [maximum input]}]
+  (let [ranges-by-row-by-sensor (map (comp get-ranges-by-row parse-line) input)
+        ranges-in-bounds (map (partial keep-in-bounds maximum) ranges-by-row-by-sensor)
+        rows (distinct (mapcat keys ranges-in-bounds))
+
+        ranges-by-row (zipmap rows
+                              (map (fn [row]
+                                     (sort
+                                       (remove nil?
+                                               (map #(get % row) ranges-in-bounds))))
+                                   rows))
+        merged-ranges-by-row (utils/map-vals merge-all-ranges ranges-by-row)
+        [[y [r1 r2]]] (filter #(= 2 (count (second %))) merged-ranges-by-row)
+        missing-x (inc (second r1)) ]
+    (+ y (* missing-x 4000000))))
+
 (utils/verify-solutions
   [{:method solve-1-fast :sample 26 :input 5716881}
-   #_ {:method solve-2 :sample 56000011 :input nil}]
-  {:value {:row 10 :input sample}}
-  {:row 2000000 :input (utils/get-lines 2022 15)})
+   {:method solve-2 :sample 56000011}]
+  {:value {:row 10 :maximum 20 :input sample}}
+  {:row 2000000 :maximum 4000000 :input (utils/get-lines 2022 15)})
