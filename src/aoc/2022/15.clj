@@ -81,18 +81,29 @@
                       (cons r2 merged))]
         (recur merged' remaining')))))
 
-(defn solve-1
+(defn solve-1-fast
   [{:keys [row input]}]
   (->> input
-     (map parse-line)
-     (map #(get-row-at (:sensor %) (get-distance (:sensor %) (:beacon %)) row))
+       (map (comp (fn [{:keys [sensor beacon]}]
+                    (get-row-at sensor (get-distance sensor beacon) row))
+                  parse-line))
+       sort
+       merge-all-ranges
+       (map #(utils/abs (- (second %) (first %))))
+       (reduce +)))
+
+(defn solve-1-complete
+  [{:keys [row input]}]
+  (->> input
+     (map (comp #(get % row) get-ranges-by-row parse-line))
+     (remove nil?)
      sort
      merge-all-ranges
      (map #(utils/abs (- (second %) (first %))))
      (reduce +)))
 
 (utils/verify-solutions
-  [{:method solve-1 :sample 26 :input 5716881}
-   #_ {:method solve-2 :sample nil :input nil}]
+  [{:method solve-1-fast :sample 26 :input 5716881}
+   #_ {:method solve-2 :sample 56000011 :input nil}]
   {:value {:row 10 :input sample}}
   {:row 2000000 :input (utils/get-lines 2022 15)})
