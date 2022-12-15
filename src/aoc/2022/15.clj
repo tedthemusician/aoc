@@ -81,27 +81,49 @@
                         (cons r2 merged))]
           (recur merged' remaining'))))))
 
-(defn entry-in-bounds?
-  [hi [row x-range]]
-  (and (>= row 0)
-       (<= row hi)
-       (some #(>= % 0) x-range)
+(defn get-ranges-at-row
+  "Get all sensors' x ranges at a given a row"
+  [row sensors]
+  (merge-all-ranges (map (partial get-row-at row) sensors)))
+
+(defn range-in-bounds?
+  "Does a range overlap with the region between 0 and hi?"
+  [hi x-range]
+  (and (some #(>= % 0) x-range)
        (some #(<= % hi) x-range)))
 
 (defn keep-in-bounds
-  [hi rows]
-  (into {} (filter (partial entry-in-bounds? hi)) rows))
+  "Keep only ranges that overlap with the region between 0 and hi"
+  [hi ranges]
+  (filter (partial range-in-bounds? hi) ranges))
 
-(defn solve-1-fast
+(defn entry-has-multiple?
+  "Does an entry in a map whose values are collections have multiple items in
+  that collection?"
+  [[k v]]
+  (> 1 (count v)))
+
+(defn solve-1
   [{:keys [row input]}]
   (->> input
-       (map (comp (partial get-row-at row) parse-line))
-       merge-all-ranges
+       (map parse-line)
+       (get-ranges-at-row row)
        (map #(utils/abs (- (second %) (first %))))
        (reduce +)))
 
+(defn solve-2
+  [{:keys [maximum input]}]
+  (let [sensors (map parse-line input)
+        ys (range (inc maximum))
+        ranges (zipmap ys (map #(get-ranges-at-row % sensors) ys))
+        ranges-in-bounds (utils/map-vals (partial keep-in-bounds maximum) ranges)
+        [row-with-multiple-ranges] (filter #(> (count (second %)) 1) ranges-in-bounds)
+        [y [r1 r2]] row-with-multiple-ranges
+        x (inc (second r1))]
+    (+ y (* x 4000000))))
+
 (utils/verify-solutions
-  [{:method solve-1-fast :sample 26 :input 5716881}
-   #_ {:method solve-2 :sample 56000011}]
+  [{:method solve-1 :sample 26 :input 5716881}
+   {:method solve-2 :sample 56000011}]
   {:value {:row 10 :maximum 20 :input sample}}
-  #_ {:row 2000000 :maximum 4000000 :input (utils/get-lines 2022 15)})
+  {:row 2000000 :maximum 4000000 :input (utils/get-lines 2022 15)})
